@@ -7,7 +7,7 @@ class Line:
         self.weight = array.array('d', [1] * self.pop_size)
         self.intercept = intercept
         # output (y) for each line
-        self.output = self.get_output()
+        self.output = self.calc_output()
 
     # getters
     def get_pop_size(self):
@@ -17,9 +17,6 @@ class Line:
     def get_weight(self):
         return self.weight
     def get_output(self):
-        self.output = array.array('d', [0] * self.pop_size)
-        for i in range(self.pop_size):
-            self.output[i] = self.weight[i] * self.data_value[i]
         return self.output
 
     # setters
@@ -31,6 +28,13 @@ class Line:
         self.intercept = intercept
     def set_output(self, output):
         self.output = output
+
+    # calculate output
+    def calc_output(self):
+        self.output = array.array('d', [0] * self.pop_size)
+        for i in range(self.pop_size):
+            self.output[i] = self.weight[i] * self.data_value[i]
+        return self.output
 
 # test 1 data point
 s = [0.64, 0.64, 0.64]
