@@ -4,10 +4,11 @@ import numpy as np
 LEARNING_RATE = 0.1
 
 
-class PopLine:
-    def __init__(self, data_value, intercept=0):
-        self.pop_size = len(data_value)
-        self.data_value = np.array(data_value, dtype='f')
+class HypothesisSpace:
+    def __init__(self, data_values, real_values, intercept=0):
+        self.pop_size = len(data_values)
+        self.data_values = np.array(data_values, dtype='f')
+        self.real_values = real_values
         self.weight = np.array([1] * self.pop_size, dtype='f')
         self.intercept = intercept
         # output (y) for each line
@@ -17,9 +18,11 @@ class PopLine:
     def get_pop_size(self):
         return self.pop_size
 
-    def get_data_value(self):
+    def get_data_values(self):
+        return self.data_values
 
-        return self.data_value
+    def get_real_values(self):
+        return self.real_values
 
     def get_weight(self):
         return self.weight
@@ -27,9 +30,13 @@ class PopLine:
     def get_output(self):
         return self.output
 
+
     # setters
-    def set_data_value(self, data_value):
-        self.data_value = data_value
+    def set_data_values(self, data_values):
+        self.data_values = data_values
+
+    def set_real_values(self, real_values):
+        self.real_values = real_values
 
     def set_weight(self, weight):
         self.weight = weight
@@ -46,15 +53,15 @@ class PopLine:
     def calc_output(self):
         self.output = np.array([0] * self.pop_size, dtype='f')
         for i in range(self.pop_size):
-            self.output[i] = self.weight[i] * self.data_value[i] + self.intercept
-        return self.output
+            self.output[i] = self.weight[i] * self.data_values[i] + self.intercept
+        return np.round(self.output,4)
 
 
 class LinearRegression:
     def __init__(self, line, actual_data):
         self.error = self.calc_error(line.output, actual_data)
         self.mse = self.mean_squared_error(self.error)
-        self.step_size = 0
+        self.step_size = 1
 
     # getters
     def get_error(self):
@@ -74,14 +81,14 @@ class LinearRegression:
         self.mse = mse
 
     def set_step_size(self, step_size):
-        self.step_size = step_size
+        self.step_size = round(step_size,4)
 
     # helper functions
     def calc_error(self, hypothesis, actual_value):
         error = np.array([0] * len(actual_value), dtype='f')
         for i in range(len(actual_value)):
             error[i] = actual_value[i] - hypothesis[i]
-        return error
+        return np.round(error,4)
 
     def mean_squared_error(self, error):
         e_squared_sum = 0
@@ -101,6 +108,20 @@ class LinearRegression:
             new_weight[i] = old_weight[i] - self.step_size
         return new_weight
 
+    def optimize(self, hypothesis):
+        n = len(hypothesis.get_data_values())
+        for i in range(n):
+            print(i)
+            if abs(self.get_step_size()) < 0.001:
+                break
+            hypothesis.set_weight(self.new_weight(hypothesis.get_weight(),
+                                                  hypothesis.get_data_values(),self.get_error()))
+            self.set_error(self.calc_error(hypothesis.get_output(),hypothesis.get_real_values()))
+            print(self.get_step_size())
+
+
+
+
 
 
 # test 1 data point
@@ -108,36 +129,31 @@ w = [0.64, 0.64, 0.64]
 x = [0.5, 2.3, 2.9]
 y = [1.4, 1.9, 3.2]
 
-pl = PopLine(x)
-pl.set_weight(w)
-lin_reg = LinearRegression(pl, y)
+hs = HypothesisSpace(x,y)
+hs.set_weight(w)
+lin_reg = LinearRegression(hs, y)
 
-np.set_printoptions(precision=3)
-print("actual:")
+print("initial weight:")
+print(hs.get_weight())
+print("inital actual:")
 print(y)
-print("output:")
-print(*pl.output)
-print("error:")
+print("initial output:")
+print(*hs.output)
+print("initial error:")
 print(*lin_reg.error)
-print("mse:")
+print("initail mse:")
 print(lin_reg.mean_squared_error(lin_reg.get_error()))
-
 print()
 
-for i in range(10):
-    print()
-    print("Old weight:")
-    print(*pl.get_weight())
-    pl.set_weight(lin_reg.new_weight(pl.get_weight(),pl.get_data_value(),lin_reg.get_error()))
-    print("New weight:")
-    print(*pl.get_weight())
-    print("new output:")
-    print(*pl.get_output())
-    print("step size:")
-    print(lin_reg.get_step_size())
-    print("new error:")
-    lin_reg.set_error(lin_reg.calc_error(pl.get_output(),y))
-    print(*lin_reg.get_error())
-    print("mse:")
-    print(lin_reg.mean_squared_error(lin_reg.get_error()))
+lin_reg.optimize(hs)
 
+print("New weight:")
+print(hs.get_weight())
+print("New actual:")
+print(y)
+print("New output:")
+print(*hs.output)
+print("New error:")
+print(*lin_reg.error)
+print("New mse:")
+print(lin_reg.mean_squared_error(lin_reg.get_error()))
