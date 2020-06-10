@@ -3,11 +3,12 @@ import numpy as np
 
 LEARNING_RATE = 0.1
 
+
 class PopLine:
     def __init__(self, data_value, intercept=0):
         self.pop_size = len(data_value)
-        self.data_value = arr.array('d', data_value)
-        self.weight = arr.array('d', [1] * self.pop_size)
+        self.data_value = np.array(data_value, dtype='f')
+        self.weight = np.array([1] * self.pop_size, dtype='f')
         self.intercept = intercept
         # output (y) for each line
         self.output = self.calc_output()
@@ -43,7 +44,7 @@ class PopLine:
 
     # helper functions
     def calc_output(self):
-        self.output = arr.array('d', [0] * self.pop_size)
+        self.output = np.array([0] * self.pop_size, dtype='f')
         for i in range(self.pop_size):
             self.output[i] = self.weight[i] * self.data_value[i] + self.intercept
         return self.output
@@ -77,7 +78,7 @@ class LinearRegression:
 
     # helper functions
     def calc_error(self, hypothesis, actual_value):
-        error = arr.array('d', [0] * len(actual_value))
+        error = np.array([0] * len(actual_value), dtype='f')
         for i in range(len(actual_value)):
             error[i] = actual_value[i] - hypothesis[i]
         return error
@@ -87,11 +88,11 @@ class LinearRegression:
         n = len(error)
         for i in range(n):
             e_squared_sum += pow(error[i], 2)
-        return (1 / (2 * n)) * e_squared_sum
+        return round((1 / (2 * n)) * e_squared_sum,4)
 
     def new_weight(self, old_weight, data_values, error):
         n = len(data_values)
-        new_weight = arr.array('d', [0] * n)
+        new_weight = np.array([0] * n, dtype='f')
         sum_error_and_data = 0
         for i in range(n):
             sum_error_and_data += error[i] * data_values[i]
@@ -111,6 +112,7 @@ pl = PopLine(x)
 pl.set_weight(w)
 lin_reg = LinearRegression(pl, y)
 
+np.set_printoptions(precision=3)
 print("actual:")
 print(y)
 print("output:")
