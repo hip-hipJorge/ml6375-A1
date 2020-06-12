@@ -39,7 +39,7 @@ attr = {
 # hs, hypothesis space
 n = df.shape[0]
 tn = int(n/4)
-hs = np.empty([tn,7], dtype='f')
+hs = np.empty([tn,1], dtype='f')
 
 # training_data, the data used to build
 training_data = np.empty([tn, 6], dtype='i')
@@ -50,7 +50,11 @@ for i in range(tn):
     training_data[i] = list_format(list(df.iloc[i, 0:6]), attr)
     y[i] = list_format([df.iloc[i, 6]], attr)
 
-#print(df.head())
+ideal_weight = gradient_descent(hs, training_data, 200, y)
+acc_test = list_format(list(df.iloc[500, 0:6]), attr)
 
-weight = [1, 1, 1, 1, 1, 1, 1]
-print(calc_error(gradient_descent(training_data, 1, y), training_data[0], y[1]))
+h = prediction(ideal_weight, acc_test)
+
+print(int(h))
+y_test = df.iloc[500, 6]
+print(y_test)
