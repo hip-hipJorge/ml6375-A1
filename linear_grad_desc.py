@@ -1,122 +1,97 @@
 import numpy as np
-LEARNING_RATE = 0.1
+LEARNING_RATE = 0.0001
 
 
-class HypothesisSpace:
-    def __init__(self, data_values, real_values):
-        self.pop_size = len(data_values)
-        self.data_values = np.array(data_values, dtype='f')
-        self.real_values = real_values
-        self.weight = np.array([1] * self.pop_size, dtype='f')
-        self.intercept = 1
-        # output (y) for each line
-        self.output = self.calc_output()
+def optimize_weight(weight, training_data, y):
+    # weights of data set and intercept
+    w0 = weight[0]
+    w1 = weight[1]
+    w2 = weight[2]
+    w3 = weight[3]
+    w4 = weight[4]
+    w5 = weight[5]
+    b = weight[6]
 
-    # getters
-    def get_pop_size(self):
-        return self.pop_size
+    # initialize weight steps
+    w0_step = 0
+    w1_step = 0
+    w2_step = 0
+    w3_step = 0
+    w4_step = 0
+    w5_step = 0
+    b_step = 0
 
-    def get_data_values(self):
-        return self.data_values
+    # number of instances, n
+    n = len(training_data)
 
-    def get_real_values(self):
-        return self.real_values
+    # iterate through ith row
+    for i in range(n):
+        # read in ith row
+        x0 = training_data[i][0]
+        x1 = training_data[i][1]
+        x2 = training_data[i][2]
+        x3 = training_data[i][3]
+        x4 = training_data[i][4]
+        x5 = training_data[i][5]
 
-    def get_weight(self):
-        return self.weight
+        # calculate hypothesis
+        h = w0*x0 + w1*x1 + w2*x2 + w3*x3 + w4*x4 + w5*x5 + b
 
-    def get_output(self):
-        return self.output
+        # calculate step size
+        w0_step += round(- (2/n) * w0 * (y[i][0] - h), 4)
+        w1_step += round(- (2/n) * w1 * (y[i][0] - h), 4)
+        w2_step += round(- (2/n) * w2 * (y[i][0] - h), 4)
+        w3_step += round(- (2/n) * w3 * (y[i][0] - h), 4)
+        w4_step += round(- (2/n) * w4 * (y[i][0] - h), 4)
+        w5_step += round(- (2/n) * w5 * (y[i][0] - h), 4)
+        b_step += round(- (2/n) * (y[i][0] - h), 4)
 
-    def get_intercept(self):
-        return self.intercept
-
-    # setters
-    def set_data_values(self, data_values):
-        self.data_values = data_values
-
-    def set_real_values(self, real_values):
-        self.real_values = real_values
-
-    def set_weight(self, weight):
-        self.weight = weight
-        # new output
-        self.output = self.calc_output()
-
-    def set_intercept(self, intercept):
-        self.intercept = intercept
-
-    def set_output(self, output):
-        self.output = output
-
-    # helper functions
-    def calc_output(self):
-        self.output = np.array([0] * self.pop_size, dtype='f')
-        self.set_intercept(self.weight[0])
-        for i in range(self.pop_size):
-            self.output[i] = self.weight[i] * self.data_values[i] + self.intercept
-        return np.round(self.output, 4)
-
-
-class LinearRegression:
-    def __init__(self, line, actual_data):
-        self.error = self.calc_error(line.output, actual_data)
-        self.mse = self.mean_squared_error(self.error)
-        self.step_size = 1
-
-    # getters
-    def get_error(self):
-        return self.error
-
-    def get_mse(self):
-        return self.mse
-
-    def get_step_size(self):
-        return self.step_size
-
-    # setters
-    def set_error(self, error):
-        self.error = error
-        self.set_mse(self.mean_squared_error(error))
-
-    def set_mse(self, mse):
-        self.mse = mse
-
-    def set_step_size(self, step_size):
-        self.step_size = round(step_size, 4)
-
-    # helper functions
-    def calc_error(self, hypothesis, actual_value):
-        error = np.array([0] * len(actual_value), dtype='f')
-        for i in range(len(actual_value)):
-            error[i] = actual_value[i] - hypothesis[i]
-        return np.round(error, 4)
-
-    def mean_squared_error(self, error):
-        e_squared_sum = 0
-        n = len(error)
-        for i in range(n):
-            e_squared_sum += pow(error[i], 2)
-        return round((1 / (2 * n)) * e_squared_sum, 4)
-
-    def new_weight(self, old_weight, data_values, error):
-        n = len(data_values)
-        new_weight = np.array([0] * n, dtype='f')
-        sum_error_and_data = 0
-        for i in range(n):
-            sum_error_and_data += error[i] * data_values[i]
-        self.set_step_size(LEARNING_RATE * ((-1 / n) * sum_error_and_data))
-        for i in range(n):
-            new_weight[i] = old_weight[i] - self.step_size
-        return new_weight
-
-    def optimize(self, hypothesis):
-        while abs(self.get_step_size()) > 0.001:
-            hypothesis.set_weight(self.new_weight(hypothesis.get_weight(),
-                                                  hypothesis.get_data_values(), self.error))
-            self.set_error(self.calc_error(hypothesis.get_output(), hypothesis.get_real_values()))
-        hypothesis.set_intercept(hypothesis.get_intercept()-self.step_size)
+        # calculate new weight
+        w0 = round(w0 - (LEARNING_RATE * w0_step), 4)
+        w1 = round(w1 - LEARNING_RATE * w1_step, 4)
+        w2 = round(w2 - LEARNING_RATE * w2_step, 4)
+        w3 = round(w3 - LEARNING_RATE * w3_step, 4)
+        w4 = round(w4 - LEARNING_RATE * w4_step, 4)
+        w5 = round(w5 - LEARNING_RATE * w5_step, 4)
+        b = round(b - LEARNING_RATE * b_step, 4)
+    new_weight = [w0, w1, w2, w3, w4, w5, b]
+    print(new_weight)
+    return new_weight
 
 
+def calc_error(weight, data_set, y):
+    # weights of data set and intercept
+    w0 = weight[0]
+    w1 = weight[1]
+    w2 = weight[2]
+    w3 = weight[3]
+    w4 = weight[4]
+    w5 = weight[5]
+    b = weight[6]
 
+    # initialize data
+    x0 = data_set[0]
+    x1 = data_set[1]
+    x2 = data_set[2]
+    x3 = data_set[3]
+    x4 = data_set[4]
+    x5 = data_set[5]
+
+    # calculate hypothesis
+    h = w0*x0 + w1*x1 + w2*x2 + w3*x3 + w4*x4 + w5*x5 + b
+
+    return h - y
+
+
+def gradient_descent(training_data, iterations, y):
+    opt_weight = np.array([1] * 7)
+    for i in range(iterations):
+        opt_weight = optimize_weight(opt_weight, training_data, y)
+    return opt_weight
+
+
+def list_format(lst, dict):
+    for i in range(len(lst)):
+        lst[i] = dict[lst[i]]
+    return lst
 

@@ -1,6 +1,54 @@
-import linear_grad_desc as lgd
 import pandas as pd
+from linear_grad_desc import *
 
-df = pd.read_csv("car.data")
+# prepare data
+url = "https://www.utdallas.edu/~jxp175430/car.data"
 
-df.head()
+# df = pd.read_csv(url, delimiter='\t')
+df = pd.read_csv("car.data", delimiter='\t')
+
+# create hashmap for attributes
+attr = {
+    # buying/maint/safety
+    'vhigh': 4,
+    'high': 3,
+    'med': 2,
+    'low': 1,
+    # lug_boot
+    'big': 3,
+    'med': 2,
+    'small': 1,
+    # doors/persons
+    '2': 2,
+    '3': 3,
+    '4': 4,
+    '5more': 5,
+    # persons
+    'more': 5,
+    # class values
+    'unacc': 1,
+    'acc': 2,
+    'good': 3,
+    'vgood': 4
+}
+
+
+# feed data into hypothesis space
+# n, the number of instances
+n = df.shape[0]
+tn = int(n/4)
+
+training_data = np.empty([tn, 6], dtype='i')
+y = np.empty([tn, 1], dtype='i')
+
+
+for i in range(tn):
+    training_data[i] = list_format(list(df.iloc[i, 0:6]), attr)
+    y[i] = list_format([df.iloc[i, 6]], attr)
+
+#print(df.head())
+
+weight = [1, 1, 1, 1, 1, 1, 1]
+print(calc_error(gradient_descent(training_data, 1, y), training_data[0], y[1]))
+
+print(df.head(100))
