@@ -1,5 +1,5 @@
 import numpy as np
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.001
 
 
 def optimize_weight(weight, training_data, y):
@@ -38,12 +38,12 @@ def optimize_weight(weight, training_data, y):
         h = w0*x0 + w1*x1 + w2*x2 + w3*x3 + w4*x4 + w5*x5 + b
 
         # calculate step size
-        w0_step += round(- (2/n) * w0 * (y[i][0] - h), 4)
-        w1_step += round(- (2/n) * w1 * (y[i][0] - h), 4)
-        w2_step += round(- (2/n) * w2 * (y[i][0] - h), 4)
-        w3_step += round(- (2/n) * w3 * (y[i][0] - h), 4)
-        w4_step += round(- (2/n) * w4 * (y[i][0] - h), 4)
-        w5_step += round(- (2/n) * w5 * (y[i][0] - h), 4)
+        w0_step += round(- (2/n) * x0 * (y[i][0] - h), 4)
+        w1_step += round(- (2/n) * x1 * (y[i][0] - h), 4)
+        w2_step += round(- (2/n) * x2 * (y[i][0] - h), 4)
+        w3_step += round(- (2/n) * x3 * (y[i][0] - h), 4)
+        w4_step += round(- (2/n) * x4 * (y[i][0] - h), 4)
+        w5_step += round(- (2/n) * x5 * (y[i][0] - h), 4)
         b_step += round(- (2/n) * (y[i][0] - h), 4)
 
         # calculate new weight

@@ -35,9 +35,13 @@ attr = {
 
 # feed data into hypothesis space
 # n, the number of instances
+# tn, the number of instances for training
+# hs, hypothesis space
 n = df.shape[0]
 tn = int(n/4)
+hs = np.empty([tn,7], dtype='f')
 
+# training_data, the data used to build
 training_data = np.empty([tn, 6], dtype='i')
 y = np.empty([tn, 1], dtype='i')
 
@@ -50,5 +54,3 @@ for i in range(tn):
 
 weight = [1, 1, 1, 1, 1, 1, 1]
 print(calc_error(gradient_descent(training_data, 1, y), training_data[0], y[1]))
-
-print(df.head(100))
