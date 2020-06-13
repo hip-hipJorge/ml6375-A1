@@ -65,6 +65,12 @@ def gradient_descent(hs, training_data, iterations, y):
     opt_weight = np.array([1] * 7)
     for i in range(iterations):
         opt_weight = optimize_weight(hs, opt_weight, training_data, y)
+        if i == 50 or i == 100 or i == 500 or i == 1000:
+            print("MSE at iteration %i" % i)
+            print(calc_mse(hs, y))
+            print("weights at iteration %i" % i)
+            print(opt_weight)
+            print("...\n")
     return opt_weight
 
 
@@ -109,8 +115,6 @@ def list_format(lst, attr):
 
 
 def prediction(hyp_weight, data_points):
-    print(hyp_weight)
-    print(data_points)
     h = hyp_weight[0]*data_points[0] + hyp_weight[1]*data_points[1]\
         + hyp_weight[2]*data_points[2] + hyp_weight[3]*data_points[3]\
         + hyp_weight[4]*data_points[4] + hyp_weight[5]*data_points[5]\

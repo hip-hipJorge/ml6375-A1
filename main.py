@@ -1,11 +1,12 @@
 import pandas as pd
 from linear_grad_desc import *
 
-# prepare data
-url = "https://www.utdallas.edu/~jxp175430/car.data"
+# read data from...
+#url = "https://www.utdallas.edu/~jxp175430/car.data"
+url = "https://raw.githubusercontent.com/hip-hipJorge/ml6375-A1/master/car.data"
 
-# df = pd.read_csv(url, delimiter='\t')
-df = pd.read_csv("car.data", delimiter='\t')
+df = pd.read_csv(url, delimiter='\t')
+#df = pd.read_csv("car.data", delimiter='\t')
 
 # create hashmap for attributes
 attr = {
@@ -32,29 +33,53 @@ attr = {
     'vgood': 4
 }
 
+# lite pre-processing, feed data into hypothesis space
 
-# feed data into hypothesis space
 # n, the number of instances
-# tn, the number of instances for training
+# tn, the number of instances for training (75/25)
 # hs, hypothesis space
 n = df.shape[0]
 tn = int(n/4)
-hs = np.empty([tn,1], dtype='f')
+hs = np.empty([tn, 1], dtype='f')
 
 # training_data, the data used to build
+# y, the real values
 training_data = np.empty([tn, 6], dtype='i')
 y = np.empty([tn, 1], dtype='i')
 
-
+# add data instances to training data
 for i in range(tn):
     training_data[i] = list_format(list(df.iloc[i, 0:6]), attr)
     y[i] = list_format([df.iloc[i, 6]], attr)
 
-ideal_weight = gradient_descent(hs, training_data, 200, y)
-acc_test = list_format(list(df.iloc[500, 0:6]), attr)
 
-h = prediction(ideal_weight, acc_test)
+# work data to find best parameters
+# prompt for number of iterations (assuming valid input)
+iter = int(input("Number of iterations? (int): "))
+print("Please wait ...\n")
+hypothesis = gradient_descent(hs, training_data, iter, y)
 
-print(int(h))
-y_test = df.iloc[500, 6]
-print(y_test)
+# select which instance of df to predict/compare class value (assuming valid input)
+nth_row = int(input("What row do we use to evaluate our hypothesis? (0-1728): "))
+row = list_format(list(df.iloc[nth_row, 0:6]), attr)
+
+# evaluate work
+h = prediction(hypothesis, row)
+
+# class value
+class_val = df.iloc[nth_row, 6]
+
+# results
+print("\nThe estimated class value: %.3f" % h)
+print("The real class value: %i\n" % attr[class_val])
+
+if int(h+1) == attr[class_val] or int(h-1) == attr[class_val]:
+    print("Hmm..not bad.\n")
+else:
+    print("Uh-oh. Needs work.\n")
+
+print("Other important information:")
+print("\tLearning rate: %.3f" % LEARNING_RATE)
+print("\tOverall MSE: %.3f" % calc_mse(hs, y))
+print("\tParameters after %i iterations:" % iter)
+print(hypothesis)
