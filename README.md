@@ -13,4 +13,9 @@ your results.
 - README.md
 
 ## Instructions
-...
+Once in directory, type command: <br>
+python [filename].py 
+
+or
+
+python3 [filename].py

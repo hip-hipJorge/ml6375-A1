@@ -1,12 +1,20 @@
 import pandas as pd
 from linear_grad_desc import *
+import requests
+import io
 
 # read data from...
-#url = "https://www.utdallas.edu/~jxp175430/car.data"
+# url = "https://www.utdallas.edu/~jxp175430/car.data"
+# if that url does not read, comment out and use this one:
 url = "https://raw.githubusercontent.com/hip-hipJorge/ml6375-A1/master/car.data"
 
-df = pd.read_csv(url, delimiter='\t')
-#df = pd.read_csv("car.data", delimiter='\t')
+# read data from public source
+read_data = requests.get(url).content
+df = pd.read_csv(io.StringIO(read_data.decode('utf-8')), delimiter='\t')
+
+# open log file
+log = open("log.txt", 'w')
+print("Linear Regression Log Part 1\n", file=log)
 
 # create hashmap for attributes
 attr = {
@@ -17,7 +25,6 @@ attr = {
     'low': 1,
     # lug_boot
     'big': 3,
-    'med': 2,
     'small': 1,
     # doors/persons
     '2': 2,
@@ -56,11 +63,14 @@ for i in range(tn):
 # work data to find best parameters
 # prompt for number of iterations (assuming valid input)
 iter = int(input("Number of iterations? (int): "))
-print("Please wait ...\n")
-hypothesis = gradient_descent(hs, training_data, iter, y)
+print("Number of desired iterations is %i" % iter, file=log)
+
+# train data
+hypothesis = gradient_descent(hs, training_data, iter, y, log)
 
 # select which instance of df to predict/compare class value (assuming valid input)
 nth_row = int(input("What row do we use to evaluate our hypothesis? (0-1728): "))
+print("Desired Data instance is number %i" % nth_row, file=log)
 row = list_format(list(df.iloc[nth_row, 0:6]), attr)
 
 # evaluate work
@@ -70,16 +80,20 @@ h = prediction(hypothesis, row)
 class_val = df.iloc[nth_row, 6]
 
 # results
-print("\nThe estimated class value: %.3f" % h)
-print("The real class value: %i\n" % attr[class_val])
+print("--------------------------------------", file=log)
+print("The estimated class value: %.3f" % h, file=log)
+print("The real class value: %i\n" % attr[class_val], file=log)
 
 if int(h+1) == attr[class_val] or int(h-1) == attr[class_val]:
-    print("Hmm..not bad.\n")
+    print("Hmm..not bad.\n\n", file=log)
 else:
-    print("Uh-oh. Needs work.\n")
+    print("Uh-oh. Needs work.", file=log)
 
-print("Other important information:")
-print("\tLearning rate: %.3f" % LEARNING_RATE)
-print("\tOverall MSE: %.3f" % calc_mse(hs, y))
-print("\tParameters after %i iterations:" % iter)
-print(hypothesis)
+print("Other important information:", file=log)
+print("\tLearning rate: %.3f" % LEARNING_RATE, file=log)
+print("\tOverall MSE: %.3f" % calc_mse(hs, y), file=log)
+print("\tParameters after %i iterations:" % iter, file=log)
+print(hypothesis, file=log)
+
+log.close()
+print("See report in log.txt")

@@ -61,16 +61,16 @@ def optimize_weight(hs, weight, training_data, y):
     return new_weight
 
 
-def gradient_descent(hs, training_data, iterations, y):
+def gradient_descent(hs, training_data, iterations, y, log):
     opt_weight = np.array([1] * 7)
     for i in range(iterations):
         opt_weight = optimize_weight(hs, opt_weight, training_data, y)
         if i == 50 or i == 100 or i == 500 or i == 1000:
-            print("MSE at iteration %i" % i)
-            print(calc_mse(hs, y))
-            print("weights at iteration %i" % i)
-            print(opt_weight)
-            print("...\n")
+            print("MSE at iteration %i" % i, file=log)
+            print(calc_mse(hs, y), file=log)
+            print("weights at iteration %i" % i, file=log)
+            print(opt_weight, file=log)
+            print("\n...\n", file=log)
     return opt_weight
 
 
