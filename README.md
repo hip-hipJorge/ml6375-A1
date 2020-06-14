@@ -11,11 +11,11 @@ your results.
 - linear_grad_desc.py (imported implemented modules)
 - part2.py
 - README.md
+- CS6375_CoverPage 
 
-## Instructions
-Once in directory, type command: <br>
-python [filename].py 
+## Run Instructions
+Once in directory, enter one of two command (dependent on machine):
 
-or
-
+python [filename].py <br>
+or <br>
 python3 [filename].py
