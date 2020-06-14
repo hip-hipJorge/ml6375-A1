@@ -1,7 +1,12 @@
 import pandas as pd
-from linear_grad_desc import *
+import numpy as np
 import requests
 import io
+from linear_grad_desc import list_format
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
+
+
 
 # read data from...
 # url = "https://www.utdallas.edu/~jxp175430/car.data"
@@ -13,8 +18,8 @@ read_data = requests.get(url).content
 df = pd.read_csv(io.StringIO(read_data.decode('utf-8')), delimiter='\t')
 
 # open log file
-log = open("log1.txt", 'w')
-print("Linear Regression Log Part 1\n", file=log)
+log = open("log2.txt", 'w')
+print("Linear Regression Log Part 2\n", file=log)
 
 # create hashmap for attributes
 attr = {
@@ -46,54 +51,53 @@ attr = {
 # tn, the number of instances for training (75/25)
 # hs, hypothesis space
 n = df.shape[0]
-tn = int(n/4)
+tn = int(n / 4)
 hs = np.empty([tn, 1], dtype='f')
 
 # training_data, the data used to build
 # y, the real values
-training_data = np.empty([tn, 6], dtype='i')
-y = np.empty([tn, 1], dtype='i')
+df_x = np.empty([tn, 6], dtype='i')
+df_y = np.empty([tn, 1], dtype='i')
 
 # add data instances to training data
 for i in range(tn):
-    training_data[i] = list_format(list(df.iloc[i, 0:6]), attr)
-    y[i] = list_format([df.iloc[i, 6]], attr)
+    df_x[i] = list_format(list(df.iloc[i, 0:6]), attr)
+    df_y[i] = list_format([df.iloc[i, 6]], attr)
 
+# create linear model
+reg = linear_model.LinearRegression()
 
-# work data to find best parameters
-# prompt for number of iterations (assuming valid input)
-iter = int(input("Number of iterations? (int): "))
-print("Number of desired iterations is %i" % iter, file=log)
+# split training data
+x_train, x_test, y_train, y_test = train_test_split(df_x, df_y, test_size=.25, random_state=4)
+reg.fit(x_train, y_train)
 
-# train data
-hypothesis = gradient_descent(hs, training_data, iter, y, log)
+# print Results
+print("Results of (25/75) data split:", file=log)
+print(reg.coef_, file=log)
 
-# select which instance of df to predict/compare class value (assuming valid input)
+# hypothesis
+h = reg.predict(x_test)
+
+# test data
 nth_row = int(input("What row do we use to evaluate our hypothesis? (0-1728): "))
 print("Desired Data instance is number %i" % nth_row, file=log)
-row = list_format(list(df.iloc[nth_row, 0:6]), attr)
-
-# evaluate work
-h = prediction(hypothesis, row)
-
-# class value
 class_val = df.iloc[nth_row, 6]
 
-# results
-print("--------------------------------------", file=log)
-print("The estimated class value: %.3f" % h, file=log)
+print("Desired Data instance is number %i" % nth_row, file=log)
+print("The estimated class value: %.3f" % h[nth_row], file=log)
 print("The real class value: %i\n" % attr[class_val], file=log)
 
+# evaluation
 if int(h+1) == attr[class_val] or int(h-1) == attr[class_val]:
-    print("Hmm..not bad.\n", file=log)
+    print("Hmm..not bad.", file=log)
 else:
-    print("Uh-oh. Needs work.\n", file=log)
+    print("Uh-oh. Needs work.", file=log)
 
-print("Other important information:", file=log)
-print("\tLearning rate: %.3f" % LEARNING_RATE, file=log)
-print("\tOverall MSE: %.3f" % calc_mse(hs, y), file=log)
-print("\tParameters after %i iterations:" % iter, file=log)
-print(hypothesis, file=log)
+# mean squared error
+print("MSE:", file=log)
+print(np.mean((h - y_test)) ** 2)
+print(file=log)
+
 
 log.close()
 print("See report in log.txt")

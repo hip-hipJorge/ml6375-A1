@@ -7,11 +7,11 @@ In the second part, a ML library is used on the same data set to compare
 your results.
 
 ## Contains
-- main.py (part 1)
+- part1.py
 - linear_grad_desc.py (imported implemented modules)
 - part2.py
 - README.md
-- CS6375_CoverPage 
+- CS4375_CoverPage 
 
 ## Run Instructions
 Once in directory, enter one of two command (dependent on machine):
@@ -19,3 +19,12 @@ Once in directory, enter one of two command (dependent on machine):
 python [filename].py <br>
 or <br>
 python3 [filename].py
+
+## All Necessary Libraries/Imports
+import pandas as pd
+from linear_grad_desc import *
+import requests
+import io
+from linear_grad_desc import list_format
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
